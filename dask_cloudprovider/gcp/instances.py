@@ -159,7 +159,7 @@ class GCPInstance(VMInterface):
         }
 
         #if self.config.get("public_ingress", True):
-	if True:
+        if True:
             config["networkInterfaces"][0]["accessConfigs"] = [
                 {
                     "kind": "compute#accessConfig",
