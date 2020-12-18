@@ -158,7 +158,8 @@ class GCPInstance(VMInterface):
             "reservationAffinity": {"consumeReservationType": "ANY_RESERVATION"},
         }
 
-        if self.config.get("public_ingress", True):
+        #if self.config.get("public_ingress", True):
+	if True:
             config["networkInterfaces"][0]["accessConfigs"] = [
                 {
                     "kind": "compute#accessConfig",
