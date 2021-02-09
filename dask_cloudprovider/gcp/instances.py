@@ -61,7 +61,7 @@ class GCPInstance(VMInterface):
         gpu_type=None,
         bootstrap=None,
         gpu_instance=None,
-        preemptible=None,
+        preemptible=False,
         **kwargs,
     ):
         super().__init__(**kwargs)
