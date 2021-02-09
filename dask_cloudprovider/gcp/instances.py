@@ -61,6 +61,7 @@ class GCPInstance(VMInterface):
         gpu_type=None,
         bootstrap=None,
         gpu_instance=None,
+        preemptible=None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -83,6 +84,7 @@ class GCPInstance(VMInterface):
         self.gpu_type = gpu_type or self.config.get("gpu_type")
         self.gpu_instance = gpu_instance
         self.bootstrap = bootstrap
+        self.preemptible = preemptible
 
         self.general_zone = "-".join(self.zone.split("-")[:2])  # us-east1-c -> us-east1
 
@@ -146,9 +148,9 @@ class GCPInstance(VMInterface):
             },
             "labels": {"container-vm": "dask-cloudprovider"},
             "scheduling": {
-                "preemptible": "false",
+                "preemptible": ("true" if self.preemptible else "false"),
                 "onHostMaintenance": "TERMINATE",
-                "automaticRestart": "true",
+                "automaticRestart": ("false" if self.preemptible else "true"),
                 "nodeAffinities": [],
             },
             "shieldedInstanceConfig": {
@@ -447,6 +449,8 @@ class GCPCluster(VMCluster):
         Configures communication security in this cluster. Can be a security
         object, or True. If True, temporary self-signed credentials will
         be created automatically.
+    preemptible: bool (optional)
+        Whether to use preemptible instances in this cluster. Defaults to ``False``.
 
     Examples
     --------
@@ -533,6 +537,7 @@ class GCPCluster(VMCluster):
         filesystem_size=None,
         auto_shutdown=None,
         bootstrap=True,
+        preemptible=None,
         **kwargs,
     ):
 
@@ -565,6 +570,7 @@ class GCPCluster(VMCluster):
             "gpu_type": gpu_type or self.config.get("gpu_type"),
             "gpu_instance": self.gpu_instance,
             "bootstrap": self.bootstrap,
+            "preemptible": preemptible if preemptible is not None else self.config.get("preemptible"),
         }
         self.scheduler_options = {**self.options}
         self.worker_options = {**self.options}
