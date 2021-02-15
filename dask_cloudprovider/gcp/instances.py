@@ -128,8 +128,7 @@ class GCPInstance(VMInterface):
                     "scopes": [
                         "https://www.googleapis.com/auth/devstorage.read_write",
                         "https://www.googleapis.com/auth/logging.write",
-                        "https://www.googleapis.com/auth/monitoring.write"
-
+                        "https://www.googleapis.com/auth/monitoring.write",
                     ],
                 }
             ],
@@ -162,7 +161,7 @@ class GCPInstance(VMInterface):
             "reservationAffinity": {"consumeReservationType": "ANY_RESERVATION"},
         }
 
-        #if self.config.get("public_ingress", True):
+        # if self.config.get("public_ingress", True):
         if True:
             config["networkInterfaces"][0]["accessConfigs"] = [
                 {
@@ -280,6 +279,7 @@ class GCPScheduler(SchedulerMixin, GCPInstance):
     def __init__(self, *args, **kwargs):
         kwargs.pop("preemptible", None)  # scheduler instances are not preemptible
         super().__init__(*args, **kwargs)
+        print("scheduler", kwargs)
 
     async def start(self):
         await self.start_scheduler()
@@ -324,6 +324,7 @@ class GCPWorker(GCPInstance):
         **kwargs,
     ):
         super().__init__(**kwargs)
+        print("worker", kwargs)
         self.scheduler = scheduler
         self.worker_class = worker_class
         self.name = f"dask-{self.cluster.uuid}-worker-{str(uuid.uuid4())[:8]}"
@@ -571,7 +572,9 @@ class GCPCluster(VMCluster):
             "gpu_type": gpu_type or self.config.get("gpu_type"),
             "gpu_instance": self.gpu_instance,
             "bootstrap": self.bootstrap,
-            "preemptible": preemptible if preemptible is not None else self.config.get("preemptible"),
+            "preemptible": preemptible
+            if preemptible is not None
+            else self.config.get("preemptible"),
         }
         self.scheduler_options = {**self.options}
         self.worker_options = {**self.options}
